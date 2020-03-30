@@ -9,45 +9,55 @@ class exp:
         self.im = self.img.copy()
         # 获得图片属性
         self.xsize, self.ysize = self.im.size
-        self.r = list(self.im.split()[0].getdata())
-        self.g = list(self.im.split()[1].getdata())
-        self.b = list(self.im.split()[2].getdata())
-        self.new_r = self.r.copy()
-        self.new_g = self.g.copy()
-        self.new_b = self.b.copy()
+        self.rgb = list(self.im.getdata())
+        self.new_rgb = self.rgb.copy()
 
     def set_data(self, x, y, data):
-        index = x * self.ysize + y
-        self.new_r[index] = data[0]
-        self.new_g[index] = data[1]
-        self.new_b[index] = data[2]
+        index = x * self.xsize + y
+        self.new_rgb[index] = data
 
     def get_data(self, x, y):
         index = x * self.xsize + y
-        return (self.r[index], self.g[index], self.b[index])
+        return self.rgb[index]
 
     def out_of_range(self, i, j, x, y):
         i = i + y
         j = j + x
-        index = i * self.ysize + j
-        if index > self.ysize * self.xsize:
+        if i >= self.ysize or j >= self.xsize:
             return True
         else:
             return False
 
     def save(self):
-        self.im.putdata([self.new_r, self.g, self.b])
+        self.im.putdata(self.new_rgb)
         self.im.save('test.jpg')
+        self.im.show()
+
+    def not_in_pic(self, i, j, x, y):
+        if i < y or j < x:
+            return True
+        else:
+            return False
 
     def move(self, x, y):
         zero = (0, 0, 0)
         for i in range(self.ysize):
             for j in range(self.xsize):
-                self.set_data(i, j, zero)
-                if self.out_of_range(i, j, x, y) is False:
+                if not self.out_of_range(i, j, x, y):
                     self.set_data(i + y, j + x, self.get_data(i, j))
+                if self.not_in_pic(i, j, x, y):
+                    self.set_data(i, j, zero)
+                # matrix(self.new_rgb, self.xsize, self.ysize)
         self.save()
 
 
+def matrix(matrix, xsize, ysize):
+    for j in range(ysize):
+        t = list()
+        for i in range(xsize):
+            t.append(matrix[j * ysize + i])
+        print(t)
+
+
 t = exp('color.jpg')
-t.move(3, 5)
+t.move(10, 50)
