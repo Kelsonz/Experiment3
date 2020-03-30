@@ -30,6 +30,13 @@ class exp:
         self.new_im = Image.new('RGB', (xsize, ysize))
         self.new_rgb = [(0, 0, 0)] * (xsize * ysize)
 
+    def flip(self):
+        self.new_image(self.xsize, self.ysize)
+        for i in range(self.ysize):
+            for j in range(self.xsize):
+                self.set_data(i, j, self.get_data(i, self.xsize - j - 1))
+        self.save('flip_')
+
     def resize(self, new_x, new_y):
         cx = self.xsize / new_x
         cy = self.ysize / new_y
@@ -70,5 +77,6 @@ def matrix(matrix, xsize, ysize):
 
 # t = exp('color.jpg')
 t = exp('002.jpg')
+t.flip()
 # t.move(20.2, 35.8)
 # t.resize(520, 640)
