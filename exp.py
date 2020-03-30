@@ -5,50 +5,59 @@ class exp:
     def __init__(self, filename):
         # 载入图像
         self.filename = filename
-        self.img = Image.open(filename)
-        self.im = self.img.copy()
+        self.im = Image.open(filename)
         # 获得图片属性
         self.xsize, self.ysize = self.im.size
         self.rgb = list(self.im.getdata())
-        self.new_rgb = self.rgb.copy()
 
     def set_data(self, x, y, data):
-        index = x * self.xsize + y
+        index = x * self.new_xsize + y
         self.new_rgb[index] = data
 
     def get_data(self, x, y):
         index = x * self.xsize + y
         return self.rgb[index]
 
-    def out_of_range(self, i, j, x, y):
-        i = i + y
-        j = j + x
-        if i >= self.ysize or j >= self.xsize:
-            return True
-        else:
-            return False
 
-    def save(self):
-        self.im.putdata(self.new_rgb)
-        self.im.save('test.jpg')
-        self.im.show()
+    def save(self, item):
+        self.new_im.putdata(self.new_rgb)
+        self.new_im.save(item + self.filename)
+        self.new_im.show()
 
-    def not_in_pic(self, i, j, x, y):
-        if i < y or j < x:
-            return True
-        else:
-            return False
+    def new_image(self, xsize, ysize):
+        self.new_xsize = xsize
+        self.new_ysize = ysize
+        self.new_im = Image.new('RGB', (xsize, ysize))
+        self.new_rgb = [(0, 0, 0)] * (xsize * ysize)
+
+    def resize(self, new_x, new_y):
+        cx = self.xsize / new_x
+        cy = self.ysize / new_y
+        self.new_image(new_x, new_y)
+        for i in range(new_y):
+            for j in range(new_x):
+                self.set_data(i, j, self.get_data(int(cy * i), int(cx * j)))
+        self.save('resize_')
 
     def move(self, x, y):
-        zero = (0, 0, 0)
+        x = int(x)
+        y = int(y)
+        self.new_image(x + self.xsize, y + self.ysize)
         for i in range(self.ysize):
             for j in range(self.xsize):
-                if not self.out_of_range(i, j, x, y):
-                    self.set_data(i + y, j + x, self.get_data(i, j))
-                if self.not_in_pic(i, j, x, y):
-                    self.set_data(i, j, zero)
-                # matrix(self.new_rgb, self.xsize, self.ysize)
-        self.save()
+                self.set_data(i + y, j + x, self.get_data(i, j))
+        self.save('move_')
+
+    def rgb_double_interpolating(self, xy00, xy01, xy10, xy11):
+        r = self.func(xy00[0], xy01[0], xy10[0], xy11[0])
+        g = self.func(xy00[1], xy01[1], xy10[1], xy11[1])
+        b = self.func(xy00[2], xy01[2], xy10[2], xy11[2])
+        return (r, g, b)
+
+    def func(self, xy00, xy01, xy10, xy11):
+        a = (1 - self.deltax) * xy00 + self.deltax * xy01
+        b = (1 - self.deltax) * xy10 + self.deltax * xy11
+        return (1 - self.deltay) * a + self.deltay * b
 
 
 def matrix(matrix, xsize, ysize):
@@ -59,5 +68,7 @@ def matrix(matrix, xsize, ysize):
         print(t)
 
 
-t = exp('color.jpg')
-t.move(10, 50)
+# t = exp('color.jpg')
+t = exp('002.jpg')
+# t.move(20.2, 35.8)
+# t.resize(520, 640)
