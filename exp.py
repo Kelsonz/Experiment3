@@ -80,9 +80,17 @@ class exp:
         self.save('flip_')
 
     # 图像缩放
-    def resize(self, new_x, new_y):
-        cx = self.xsize / new_x
-        cy = self.ysize / new_y
+    def resize(self, new_size):
+        if isinstance(new_size, tuple):
+            cx = self.xsize / new_size[0]
+            cy = self.ysize / new_size[1]
+            new_x = new_size[0]
+            new_y = new_size[1]
+        elif isinstance(new_size, float) or isinstance(new_size, int):
+            cx = 1 / new_size
+            cy = 1 / new_size
+            new_x = int(self.xsize / cx)
+            new_y = int(self.ysize / cy)
         self.new_image(new_x, new_y)
         for j in range(new_y):
             for i in range(new_x):
@@ -131,7 +139,8 @@ def matrix(matrix, xsize, ysize):
 
 
 t = exp('color.jpg')
-# t.rotate(40.52)
+# t.rotate(-400.5)
 # t.flip()
-t.move(200.2, 305.8)
-# t.resize(1000, 640)
+# t.move(-200.2, 305.8)
+# t.resize((10220, 400))
+t.resize(2)
