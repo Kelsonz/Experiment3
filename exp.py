@@ -31,43 +31,30 @@ class exp:
         self.new_rgb = [(0, 0, 0)] * (xsize * ysize)
 
     def rotate(self, degree):
-        cos = math.cos(math.radians(degree))
-        sin = math.sin(math.radians(degree))
+        cos = math.cos(math.radians(-degree))
+        sin = math.sin(math.radians(-degree))
         d = int(math.sqrt(math.pow(self.xsize, 2) + math.pow(self.ysize, 2)))
         x = y = d
         self.new_image(x, y)
-        for j in range(self.ysize):
-            for i in range(self.xsize):
-                X = int((i - self.xsize / 2) * cos + (j - self.ysize / 2) * sin + x / 2)
-                Y = int(-(i - self.xsize / 2) * sin + (j - self.ysize / 2) * cos + y / 2)
-                self.set_data(X, Y, self.get_data(j, i))
         for j in range(y):
             for i in range(x):
-                if self.new_rgb[j * x + i] == (0, 0, 0):
-                    cos = math.cos(math.radians(-degree))
-                    sin = math.sin(math.radians(-degree))
-                    X = (i - x / 2) * cos + (j - y / 2) * sin + self.xsize / 2
-                    Y = -(i - x / 2) * sin + (j - y / 2) * cos + self.ysize / 2
-                    if X >= self.xsize or Y >= self.ysize:
-                        pass
-                    elif X < 0 or Y < 0:
-                        pass
-                    else:
-                        self.deltax = X - int(X)
-                        self.deltay = Y - int(Y)
-                        if int(X) + 1 == self.xsize - 1:
-                            xx = self.xsize - 1
-                        else:
-                            xx = int(X) + 1
-                        if int(Y) + 1 == self.ysize - 1:
-                            yy = self.ysize - 1
-                        else:
-                            yy = int(Y) + 1
-                        xy00 = self.get_data(yy , int(X))
-                        xy01 = self.get_data(int(Y), int(X))
-                        xy10 = self.get_data(yy, xx)
-                        xy11 = self.get_data(int(Y), xx)
-                        self.set_data(i, j, self.rgb_double_interpolating(xy00, xy01, xy10, xy11))
+                X = (i - x / 2) * cos + (j - y / 2) * sin + self.xsize / 2
+                Y = -(i - x / 2) * sin + (j - y / 2) * cos + self.ysize / 2
+                if X >= self.xsize - 1 or Y >= self.ysize - 1:
+                    pass
+                elif X < 0 or Y < 0:
+                    pass
+                else:
+                    self.deltax = X - int(X)
+                    self.deltay = Y - int(Y)
+                    xx = int(X) + 1
+                    yy = int(Y) + 1
+                    xy00 = self.get_data(yy, int(X))
+                    xy01 = self.get_data(int(Y), int(X))
+                    xy10 = self.get_data(yy, xx)
+                    xy11 = self.get_data(int(Y), xx)
+                    rgb = self.rgb_double_interpolating(xy00, xy01, xy10, xy11)
+                    self.set_data(j, i, rgb)
 
         self.save('rotate_' + str(degree) + '_')
 
@@ -105,7 +92,7 @@ class exp:
     def func(self, xy00, xy01, xy10, xy11):
         a = (1 - self.deltax) * xy00 + self.deltax * xy01
         b = (1 - self.deltax) * xy10 + self.deltax * xy11
-        return (1 - self.deltay) * a + self.deltay * b
+        return (1 - self.deltay) * b + self.deltay * a
 
 
 def matrix(matrix, xsize, ysize):
@@ -116,9 +103,8 @@ def matrix(matrix, xsize, ysize):
         print(t)
 
 
-# t = exp('color.jpg')
-t = exp('002.jpg')
-t.rotate(404)
+t = exp('color.jpg')
+t.rotate(40.52)
 # t.flip()
 # t.move(20.2, 35.8)
-# t.resize(520, 640)
+# t.resize(1000, 640)
