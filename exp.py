@@ -3,7 +3,11 @@ import math
 
 
 class exp:
-    def __init__(self, filename):
+    def __init__(self, filename): # load a pic
+        """
+        Input the filename to open a picture.
+        :param filename: the name of pic file
+        """
         # 载入图像
         self.filename = filename
         self.im = Image.open(filename)
@@ -13,6 +17,13 @@ class exp:
 
     # 给新通道赋值
     def set_data(self, y, x, data):
+        """
+        Give aim pic's location and their color.
+        :param y:
+        :param x:
+        :param data:
+        :return:
+        """
         index = y * self.new_xsize + x
         self.new_rgb[index] = data
 
@@ -70,22 +81,30 @@ class exp:
         self.save('rotate_' + str(degree) + '_')
 
     # 图像反转
-    def flip(self):
+    def flip(self, axis='x'):
         self.new_image(self.xsize, self.ysize)
         for j in range(self.ysize):
             for i in range(self.xsize):
-                X = self.xsize - 1 - i
-                Y = j
+                X = Y = 0
+                if axis is 'y':
+                    X = self.xsize - 1 - i
+                    Y = j
+                elif axis is 'x':
+                    X = i
+                    Y = self.ysize - 1 - j
                 self.set_data(j, i, self.get_data(Y, X))
         self.save('flip_')
 
     # 图像缩放
     def resize(self, new_size):
+        new_x = new_y = cx = cy = 0
+        # 如果给的是具体的像素值(元组)
         if isinstance(new_size, tuple):
             cx = self.xsize / new_size[0]
             cy = self.ysize / new_size[1]
             new_x = new_size[0]
             new_y = new_size[1]
+        # 如果给的是具体的倍数
         elif isinstance(new_size, float) or isinstance(new_size, int):
             cx = 1 / new_size
             cy = 1 / new_size
@@ -139,8 +158,8 @@ def matrix(matrix, xsize, ysize):
 
 
 t = exp('color.jpg')
-# t.rotate(-400.5)
-# t.flip()
-# t.move(-200.2, 305.8)
-# t.resize((10220, 400))
-t.resize(2)
+# t.rotate(30)
+# t.flip('x')
+# t.move(200.2, 305.8)
+t.resize((3420, 4020))
+# t.resize(1.5)
